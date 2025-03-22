@@ -1,19 +1,22 @@
 var express = require('express');
 var router = express.Router();
-const axios = require('axios'); 
+//const axios = require('axios'); - discarded
+const { HfInference } = require('@huggingface/inference'); 
 require('dotenv').config();  // Load environment variables
 
-const API_URL = 'https://api-inference.huggingface.co/models/facebook/blenderbot-3B';
-
-const API_URL1 = 'https://api-inference.huggingface.co/models/microsoft/GODEL-v1_1-large-seq2seq'
-const API_URL2 = 'https://api-inference.huggingface.co/models/facebook/blenderbot-3B';
-const API_URL3 = 'https://api-inference.huggingface.co/models/gpt2-medium';
-const API_URL4 =  'https://api-inference.huggingface.co/models/google/gemma-2-2b-it';
-
-const API_URL5 = 'https://api-inference.huggingface.co/models/google/gemma-2-2b-it';
-
-
 const API_KEY = process.env.HUGGING_FACE_API_KEY;
+
+const hf = new HfInference(process.env.HUGGING_FACE_API_KEY);
+
+const MODEL_URL = 'facebook/blenderbot-3B';
+
+const MODEL_URL1 = 'microsoft/GODEL-v1_1-large-seq2seq';
+const MODEL_URL2 = 'facebook/blenderbot-3B';
+const MODEL_URL3 = 'gpt2-medium';
+const MODEL_URL4 = 'google/gemma-2-2b-it';
+
+const MODEL_URL5 = 'google/gemma-2-2b-it';
+
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -27,22 +30,17 @@ router.post('/generate-prediction', async (req, res) => {
   const { prompt } = req.body;  // Get the prompt from the frontend request
 
   try {
-    // Make the API request to Hugging Face using axios
-    const response = await axios.post(API_URL, 
-      { inputs: prompt },
-      {
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,  // Ensure your API_KEY is set correctly
-          'Content-Type': 'application/json'
-        }
-      }
-    );
-
-    // Get the generated text from the response
-    const generatedText = response.data[0]?.generated_text || "No prediction available.";
+    // Make the API request using HfInference
+    const generatedText = await hf.textGeneration({
+      model: MODEL_URL,   // Model name or path
+      inputs: prompt,     // The user input
+      parameters: {       // Optional parameters for tuning
+        max_length: 50,   // Adjust length of the generated text
+      },
+    });
 
     // Send the generated text back to the frontend
-    res.json({ generatedText });
+    res.json({ generatedText: generatedText.generated_text });
 
   } catch (error) {
     console.error('Error generating prediction:', error);
@@ -64,10 +62,10 @@ router.post('/get-model-answers', async (req, res) => {
   try {
     // Make requests to all 4 models in parallel
     const responses = await Promise.all([
-      fetchAnswer(API_URL1, userQuestion),
-      fetchAnswer(API_URL2, userQuestion),
-      fetchAnswer(API_URL3, userQuestion),
-      fetchAnswer(API_URL4, userQuestion)
+      fetchAnswer(MODEL_URL1, userQuestion),
+      fetchAnswer(MODEL_URL2, userQuestion),
+      fetchAnswer(MODEL_URL3, userQuestion),
+      fetchAnswer(MODEL_URL4, userQuestion)
     ]);
 
     // Send the answers back to the client
@@ -86,25 +84,17 @@ router.post('/get-model-answers', async (req, res) => {
 // Function to fetch answer from the Hugging Face API for a given model using axios
 async function fetchAnswer(modelUrl, userQuestion) {
   try {
-    const response = await axios.post(modelUrl, {
-      inputs: userQuestion
-    }, {
-      headers: {
-        'Authorization': `Bearer ${API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      params: {
-        max_length: 20,  // Set a max length for the response 
-        num_return_sequences: 1,  // Return one generated sequence
+    const response = await hf.textGeneration({
+      model: modelUrl,      // Use the model URL variable
+      inputs: userQuestion, // The user's question
+      parameters: {          
+        max_length: 50,      // Set a max length for the response 
+        num_return_sequences: 1, // Return one generated sequence
+        repetition_penalty: 1.2,  
       }
     });
 
-    // Assuming the response follows this structure: { 0: { generated_text: 'text here' } }
-    if (response.data && response.data[0] && response.data[0].generated_text) {
-      return response.data[0].generated_text;
-    } else {
-      return 'No response from model.';
-    }
+    return response.generated_text || 'No response from model.';
   } catch (error) {
     console.error('Error fetching from model:', error);
     return 'Error generating answer.';
@@ -116,26 +106,24 @@ async function fetchAnswer(modelUrl, userQuestion) {
 // example 3 - code in index.js - start
 // POST route to handle the Hugging Face API call for generating a story
 router.post('/generate-story', async (req, res) => {
-  const { prompt } = req.body;  // Get the prompt from the frontend request
+  
+  const { prompt } = req.body; // Get the prompt from the frontend request
 
   try {
-    // Make the API request to Hugging Face using axios
-    const response = await axios.post(API_URL5, 
-      { inputs: prompt },
-      {
-        headers: {
-          'Authorization': `Bearer ${API_KEY}`,  // Ensure your API_KEY is set correctly
-          'Content-Type': 'application/json'
-        },
-        params: {
-          max_length: 50,  // Set a max length for the response (approx 80 words)
-          num_return_sequences: 1,  // Return one generated sequence
-        }
+    // Make the API request using Hugging Face Inference API
+    const response = await hf.textGeneration({
+      model: MODEL_URL5,
+      inputs: prompt,
+      parameters: {
+        max_length: 100, // Set a max length for the response
+        num_return_sequences: 1,
+        temperature: 0.8, // Controls randomness
+        top_p: 0.9 // Nucleus sampling
       }
-    );
+    });
 
     // Get the generated text from the response
-    const generatedText = response.data[0]?.generated_text || "Sorry, I couldn't generate a story for you.";
+    const generatedText = response.generated_text || "Sorry, I couldn't generate a story for you.";
 
     // Send the generated text back to the frontend
     res.json({ generatedText });
@@ -144,6 +132,7 @@ router.post('/generate-story', async (req, res) => {
     console.error('Error generating story:', error);
     res.status(500).json({ error: 'Failed to generate story' });
   }
+
 });
 // example 3 - code in index.js - end
 

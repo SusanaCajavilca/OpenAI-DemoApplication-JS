@@ -14,7 +14,7 @@ predictionButton.addEventListener('click', async () => {
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ prompt: 'What my future behold is' })  // Prompt to get a personal prediction
+      body: JSON.stringify({ prompt: 'Your personal fortune today is:' })  // Prompt to get a personal prediction
     });
 
     const data = await response.json();

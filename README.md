@@ -1,9 +1,17 @@
-# Repo Name OpenAI-DemoApplication-JS
+# Team Hugging Face 😃
 
+# Demo Application 📖 📖
 
 ## Important  Information PLEASE READ!!
 
-Due to limitations of using a free tier in huggingFace.com, **it might be necessary to click at least 4 - 6 times** in order to get the AI generated content in each example. Sometimes the API key and the model selected will not load at the first time of executing.
+Due to limitations of using a free tier in huggingFace.com, **it might be necessary to wait a minute or so** in order to get the AI generated content. 
+
+## Members
+
+1. Susana Cajavilca Turco
+2. Emilio Sebastian Conde Ludena
+3. Avneet Kaur
+4. Toshit Narwal
 
 ## Link Live Site: 
 
@@ -12,13 +20,11 @@ Due to limitations of using a free tier in huggingFace.com, **it might be necess
 
 1- Create an account in https://huggingface.co/
 
-2- Click on the image of account, go to Access Tokens
+2- Click on the image of your account, go to Access Tokens
 
-3- Create an access token, copy and store the api key generated
+3- Create an Access token, copy and store the api key generated
 
-4- Conceive the idea to display (3 examples in one page)
-
-5- Select the models of text generation : review the docs related
+4- Select the models of text generation : review the docs related to them
 
 
 ## Models Used
@@ -50,13 +56,13 @@ Models used
 
 4- npm audit fix --force
 
-5- npm install axios
+5- npm install @huggingface/inference
 
 6- npm install dotenv
 
 7- Create a .env file and store the api key from hugging face
 
-8- require('dotenv').config(); add this line on the top of app.js
+8- require('dotenv').config();  -> add this line on the top of app.js
 
 9- Create the skeleton of the html code in index.hbs
 
@@ -64,7 +70,7 @@ Models used
 
 11- SubSteps for each Example 1 / 2 / 3
 
- a)- Update the html code in index.hbs for the section
+ a)- Update the html code in index.hbs  for the section
 
  b)- Add the code inside script.js inside javascripts
 
@@ -72,7 +78,7 @@ Models used
 
  d)- test it
 
- 12- Polish the styling with bootstrap and css
+ 12- Complete html code in layout.hbs and polish the styling with bootstrap and css
 
  13- Update the public repo content
 
