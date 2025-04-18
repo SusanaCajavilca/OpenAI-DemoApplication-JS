@@ -41,7 +41,9 @@ Models used
 
 3- gpt2-medium                         :   https://huggingface.co/openai-community/gpt2-medium
 
-4- google/gemma-2-2b-it                :   https://huggingface.co/google/gemma-2-2b-it
+4- distilgpt2                          :   https://huggingface.co/distilbert/distilgpt2
+
+*the model google/gemma-2-2b-it was replaced today April 17th by distilgpt2 because google/gemma is asking data/access permission for its use*
 
 
 ## Project Steps

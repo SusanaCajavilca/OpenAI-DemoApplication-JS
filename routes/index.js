@@ -13,9 +13,9 @@ const MODEL_URL = 'facebook/blenderbot-3B';
 const MODEL_URL1 = 'microsoft/GODEL-v1_1-large-seq2seq';
 const MODEL_URL2 = 'facebook/blenderbot-3B';
 const MODEL_URL3 = 'gpt2-medium';
-const MODEL_URL4 = 'google/gemma-2-2b-it';
+const MODEL_URL4 = 'distilgpt2';
 
-const MODEL_URL5 = 'google/gemma-2-2b-it';
+const MODEL_URL5 = 'gpt2-medium';
 
 
 /* GET home page. */
